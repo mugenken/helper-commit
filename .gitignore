@@ -1,0 +1,6 @@
+.bzr/
+.bzrignore
+Makefile.old
+blib/
+*.swp
+
