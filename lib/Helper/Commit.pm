@@ -108,14 +108,14 @@ sub bump_version {
         }
 
         $self->_new_version(1);
-        say_ok "bumped version from $old_version to $version";
+        $self->say_ok("bumped version from $old_version to $version");
 
     }
     elsif ( $self->cpan ) {
-        say_err "No version update. Unable to upload to CPAN";
+        $self->say_err ("No version update. Unable to upload to CPAN");
     }
     else {
-        say_warn "No version update.";
+        $self->say_warn("No version update.");
     }
 
     return 1;
@@ -124,18 +124,18 @@ sub bump_version {
 sub build_meta {
     my ($self) = @_;
     my $result = qx[perl Build.PL --meta];
-    say_ok 'Updating META';
+    $self->say_ok('Updating META');
 }
 
 sub build_clean {
     my ($self) = @_;
     if ( -f 'Build' && -x 'Build' ) {
         my $result = qx[./Build clean];
-        say_warn 'cleaned up';
+        $self->say_warn('cleaned up');
         say $result if $self->debug;
     }
     else {
-        say_ok 'no need to clean';
+        $self->say_ok('no need to clean');
     }
 
     return 1;
@@ -147,7 +147,7 @@ sub git_add_new_files {
 
     for (@status) {
         if (/.+new file:\s*(.*)/) {
-            say_warn "adding $1";
+            $self->say_warn("adding $1");
             my $result = qx[git add $1];
             say $result if $self->debug;
         }
@@ -162,12 +162,12 @@ sub git_commit {
     my $no_commit = grep { $_ ~~ /nothing to commit/ } @status;
 
     if ($no_commit) {
-        say_ok 'nothing to commit';
+        $self->say_ok('nothing to commit');
     }
     else {
-        say_ok 'git status:';
-        say_warn $_ for @status;
-        say_err 'enter commit message [finish with "."]';
+        $self->say_ok('git status:');
+        $self->say_warn($_) for @status;
+        $self->say_err ('enter commit message [finish with "."]');
         say_prompt;
 
         my $message = '';
@@ -179,13 +179,13 @@ sub git_commit {
         say $message if $self->debug;
 
         if ($message) {
-            say_ok 'commiting to git repo';
+            $self->say_ok('commiting to git repo');
             my $result = qx[git commit -a -m '$message'];
 
             say $result if $self->debug;
         }
         else {
-            say_err 'Canceled due to missing commit message.';
+            $self->$self->say_err('Canceled due to missing commit message.');
 
             exit 1;
         }
@@ -199,11 +199,11 @@ sub git_push {
     my $result = qx[git push 2>&1];
 
     if ( $result ~~ /Everything up-to-date/ ) {
-        say_ok 'Everything up-to-date.';
+        $self->say_ok('Everything up-to-date.');
 
     }
     else {
-        say_ok 'Pushed to git repo';
+        $self->say_ok('Pushed to git repo');
     }
 
     say $result if $self->debug;
@@ -223,7 +223,7 @@ sub tidy_up {
     );
 
     for (@files) {
-        say_ok "Tidy up $_";
+        $self->say_ok("Tidy up $_");
         my $destination = "$_.tidy_up";
         Perl::Tidy::perltidy(
             source      => $_,
@@ -241,11 +241,11 @@ sub build_dist {
     my $result = system 'perl Build.PL --dist 2>&1 > /dev/null';
 
     if ($result) {
-        say_err 'Failed to build dist. Refusing to go on.';
+        $self->say_err ('Failed to build dist. Refusing to go on.');
         exit 1;
     }
 
-    say_ok 'Built dist';
+    $self->say_ok('Built dist');
 }
 
 sub cpan_upload {
@@ -254,7 +254,7 @@ sub cpan_upload {
     my $version = Unicorn::Manager::Version->get;
     my ($file) = grep { -f && !-d && /$version/ } glob '*.tar.gz';
 
-    say_err 'PAUSE password (will not echo):';
+    $self->say_err ('PAUSE password (will not echo):');
     say_prompt;
 
     my $pass;
@@ -270,7 +270,7 @@ sub cpan_upload {
 
     $uploader->upload_file($file);
 
-    say_ok 'Uploaded to cpan!';
+    $self->say_ok('Uploaded to cpan!');
 }
 
 sub run_git {
