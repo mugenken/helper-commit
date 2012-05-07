@@ -1,0 +1,31 @@
+---
+abstract: 'Helper to push modules to git repos and CPAN'
+author:
+  - 'Mugen Kenichi <mugen.kenichi@uninets.eu>'
+build_requires:
+  Module::Build: 0.38
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.112621'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Helper-Commit
+no_index:
+  directory:
+    - t
+provides:
+  Helper::Commit:
+    file: lib/Helper/Commit.pm
+    version: 0.000001
+  Helper::Commit::Version:
+    file: lib/Helper/Commit/Version.pm
+    version: 0.000001
+requires:
+  Moo: 0
+  perl: 5.012
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.000001

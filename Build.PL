@@ -1,21 +1,76 @@
-use 5.006;
+use 5.010;
 use strict;
 use warnings;
 use Module::Build;
+use Getopt::Long;
+use lib './lib';
+use Helper::Commit::Version;
 
-my $builder = Module::Build->new(
+my $install      = 0;
+my $dist         = 0;
+my $meta         = 0;
+my $v            = Helper::Commit::Version->new;
+
+GetOptions(
+    'install' => \$install,
+    'dist'    => \$dist,
+    'meta'    => \$meta,
+);
+
+my $build = Module::Build->new(
     module_name         => 'Helper::Commit',
     license             => 'perl',
     dist_author         => q{Mugen Kenichi <mugen.kenichi@uninets.eu>},
-    dist_version_from   => 'lib/Helper/Commit.pm',
-    build_requires => {
-        'Test::More' => 0,
-    },
+    dist_version_from   => 'lib/Helper/Commit/Version.pm',
+    dist_abstract       => 'Helper to push modules to git repos and CPAN',
+
+    build_requires => { 'Module::Build' => 0.38, },
+    configure_requires => { 'Module::Build' => 0.38, },
     requires => {
-        'perl' => 5.006,
+        'perl' => 5.012,
+        'Moo' => 0,
+
     },
-    add_to_cleanup      => [ 'Helper-Commit-*' ],
+
+    add_to_cleanup      => [ 'Helper-Commit-* Build _build MYMETA.*' ],
     create_makefile_pl => 'traditional',
+
+    meta_add => {
+        no_index       => { directory => ['t'], },
+        version        => $v->get,
+        release_status => 'unstable',
+    },
+
+    meta_merge => {
+        provides => {
+            'Helper::Commit' => {
+                file    => 'lib/Helper/Commit.pm',
+                version => $v->get,
+            },
+            'Helper::Commit::Version' => {
+                file    => 'lib/Helper/Commit/Version.pm',
+                version => $v->get,
+            },
+        },
+    },
 );
 
-$builder->create_build_script();
+if ($meta) {
+    $build->dispatch('distmeta');
+}
+
+if ($dist) {
+    $build->dispatch('build');
+    $build->dispatch('test');
+    $build->dispatch('distmeta');
+    $build->dispatch('dist');
+    $build->create_build_script();
+}
+
+if ($install) {
+    $build->dispatch('build');
+    $build->dispatch( 'test', verbose => 1 );
+    $build->dispatch('install');
+    $build->create_build_script();
+}
+
