@@ -113,6 +113,7 @@ sub _bump_version {
     }
     elsif ( $self->cpan ) {
         $self->_say_err ("No version update. Unable to upload to CPAN");
+        $self->cpan(0);
     }
     else {
         $self->_say_warn("No version update.");
@@ -159,8 +160,8 @@ sub _git_add_new_files {
 sub _git_commit {
     my ($self) = @_;
     my @status = qx[git status];
-    my $no_commit = grep { $_ ~~ /nothing to commit/ } @status;
-    $no_commit = grep { $_ ~~ /no changes added to commit/ } @status;
+    my $no_commit = 0;
+    $no_commit = grep { $_ ~~ /nothing to commit/ } @status;
 
     if ($no_commit) {
         $self->_say_ok('nothing to commit');
@@ -169,7 +170,7 @@ sub _git_commit {
         $self->_say_ok('git status:');
         $self->_say_warn($_) for @status;
         $self->_say_err ('enter commit message [finish with "."]');
-        _say_prompt;
+        $self->_say_prompt;
 
         my $message = '';
         while (<>) {
@@ -256,7 +257,7 @@ sub _cpan_upload {
     my ($file) = grep { -f && !-d && /$version/ } glob '*.tar.gz';
 
     $self->_say_err ('PAUSE password (will not echo):');
-    _say_prompt;
+    $self->_say_prompt;
 
     my $pass;
     system 'stty -echo';
