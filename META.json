@@ -31,7 +31,13 @@
       },
       "runtime" : {
          "requires" : {
+            "CPAN::Uploader" : 0,
+            "File::Copy" : 0,
+            "File::Find" : 0,
+            "File::Slurp" : 0,
+            "Getopt::Long" : 0,
             "Moo" : 0,
+            "Perl::Tidy" : 0,
             "perl" : "5.012"
          }
       }

@@ -6,10 +6,10 @@ use Getopt::Long;
 use lib './lib';
 use Helper::Commit::Version;
 
-my $install      = 0;
-my $dist         = 0;
-my $meta         = 0;
-my $v            = Helper::Commit::Version->new;
+my $install = 0;
+my $dist    = 0;
+my $meta    = 0;
+my $v       = Helper::Commit::Version->new;
 
 GetOptions(
     'install' => \$install,
@@ -18,21 +18,26 @@ GetOptions(
 );
 
 my $build = Module::Build->new(
-    module_name         => 'Helper::Commit',
-    license             => 'perl',
-    dist_author         => q{Mugen Kenichi <mugen.kenichi@uninets.eu>},
-    dist_version_from   => 'lib/Helper/Commit/Version.pm',
-    dist_abstract       => 'Helper to push modules to git repos and CPAN',
+    module_name       => 'Helper::Commit',
+    license           => 'perl',
+    dist_author       => q{Mugen Kenichi <mugen.kenichi@uninets.eu>},
+    dist_version_from => 'lib/Helper/Commit/Version.pm',
+    dist_abstract     => 'Helper to push modules to git repos and CPAN',
 
-    build_requires => { 'Module::Build' => 0.38, },
+    build_requires     => { 'Module::Build' => 0.38, },
     configure_requires => { 'Module::Build' => 0.38, },
-    requires => {
-        'perl' => 5.012,
-        'Moo' => 0,
-
+    requires           => {
+        'perl'           => 5.012,
+        'Moo'            => 0,
+        'File::Find'     => 0,
+        'File::Slurp'    => 0,
+        'File::Copy'     => 0,
+        'Perl::Tidy'     => 0,
+        'Getopt::Long'   => 0,
+        'CPAN::Uploader' => 0,
     },
 
-    add_to_cleanup      => [ 'Helper-Commit-* Build _build MYMETA.*' ],
+    add_to_cleanup     => ['Helper-Commit-* Build _build MYMETA.*'],
     create_makefile_pl => 'traditional',
 
     meta_add => {

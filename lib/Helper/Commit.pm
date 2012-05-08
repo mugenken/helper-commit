@@ -5,9 +5,8 @@ use feature 'say';
 use strict;
 use warnings;
 use autodie;
-use lib 'lib';
+use lib './lib';
 use Moo;
-use Unicorn::Manager::Version;
 use Term::ANSIColor;
 use Perl::Tidy;
 use File::Find;
@@ -18,7 +17,8 @@ use CPAN::Uploader;
 
 has git          => ( is => 'rw' );
 has cpan         => ( is => 'rw' );
-has _debug        => ( is => 'rw' );
+has cpan_user    => ( is => 'rw' );
+has _debug       => ( is => 'rw' );
 has _new_version => ( is => 'rw' );
 
 sub BUILD {
@@ -97,7 +97,12 @@ sub _bump_version {
     my $old_version = qx[awk '/^Version/ {print \$2}' \$(find lib/ -name Version.pm)];
     chomp $old_version;
 
-    my $version = Unicorn::Manager::Version->get;
+    my $module = qx[awk '/^package/ {print \$2}' \$(find lib/ -name Version.pm)];
+    ( $module = $module ) =~ s/;//;
+    chomp $module;
+
+    eval "require $module";
+    my $version = $module->get;
 
     my @files = qx[grep $old_version -l \$(find -iname *.p?)];
 
@@ -112,7 +117,7 @@ sub _bump_version {
 
     }
     elsif ( $self->cpan ) {
-        $self->_say_err ("No version update. Unable to upload to CPAN");
+        $self->_say_err("No version update. Unable to upload to CPAN");
         $self->cpan(0);
     }
     else {
@@ -158,8 +163,8 @@ sub _git_add_new_files {
 }
 
 sub _git_commit {
-    my ($self) = @_;
-    my @status = qx[git status];
+    my ($self)    = @_;
+    my @status    = qx[git status];
     my $no_commit = 0;
     $no_commit = grep { $_ ~~ /nothing to commit/ } @status;
 
@@ -169,7 +174,7 @@ sub _git_commit {
     else {
         $self->_say_ok('git status:');
         $self->_say_warn($_) for @status;
-        $self->_say_err ('enter commit message [finish with "."]');
+        $self->_say_err('enter commit message [finish with "."]');
         $self->_say_prompt;
 
         my $message = '';
@@ -243,7 +248,7 @@ sub _build_dist {
     my $result = system 'perl Build.PL --dist 2>&1 > /dev/null';
 
     if ($result) {
-        $self->_say_err ('Failed to build dist. Refusing to go on.');
+        $self->_say_err('Failed to build dist. Refusing to go on.');
         exit 1;
     }
 
@@ -253,10 +258,16 @@ sub _build_dist {
 sub _cpan_upload {
     my ($self) = @_;
 
-    my $version = Unicorn::Manager::Version->get;
+    my $module = qx[awk '/^package/ {print \$2}' \$(find lib/ -name Version.pm)];
+    ( $module = $module ) =~ s/;//;
+    chomp $module;
+
+    eval "require $module";
+    my $version = $module->get;
+
     my ($file) = grep { -f && !-d && /$version/ } glob '*.tar.gz';
 
-    $self->_say_err ('PAUSE password (will not echo):');
+    $self->_say_err('PAUSE password (will not echo):');
     $self->_say_prompt;
 
     my $pass;
@@ -268,7 +279,7 @@ sub _cpan_upload {
     system 'stty echo';
     chomp $pass;
 
-    my $uploader = CPAN::Uploader->new( { user => 'mugenken', password => $pass } );
+    my $uploader = CPAN::Uploader->new( { user => $self->cpan_user, password => $pass } );
 
     $uploader->upload_file($file);
 
@@ -337,13 +348,18 @@ True or false.
 
 True or false.
 
+=head2 cpan_user
+
+Username of your PAUSE account
+
 =head1 METHODS
 
 =head2 new
 
     my $commit_helper = Helper::Commit->new(
-        git  => 0, # true if you want git commit and push
-        cpan => 0, # true if you want to upload to CPAN (will set git true!)
+        git       => 0, # true if you want git commit and push
+        cpan      => 0, # true if you want to upload to CPAN (will set git true!)
+        cpan_user => 'mugenken',
     );
 
 =head2 run
