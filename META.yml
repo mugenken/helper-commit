@@ -19,10 +19,10 @@ no_index:
 provides:
   Helper::Commit:
     file: lib/Helper/Commit.pm
-    version: 0.000001
+    version: 0.000002
   Helper::Commit::Version:
     file: lib/Helper/Commit/Version.pm
-    version: 0.000001
+    version: 0.000002
 requires:
   CPAN::Uploader: 0
   File::Copy: 0
@@ -34,4 +34,4 @@ requires:
   perl: 5.012
 resources:
   license: http://dev.perl.org/licenses/
-version: 0.000001
+version: 0.000002
