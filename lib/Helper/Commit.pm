@@ -24,7 +24,9 @@ has _new_version => ( is => 'rw' );
 sub BUILD {
     my ($self) = @_;
 
-    $self->git(1) if $self->cpan;
+    if ( $self->cpan ) {
+        die "You have to provide a cpan_user" unless $self->cpan_user;
+    }
 
 }
 
@@ -330,7 +332,7 @@ This is an unstable development release not ready for production!
 
 =head1 VERSION
 
-Version 0.000002
+Version 0.000003
 
 =head1 SYNOPSIS
 
@@ -358,7 +360,7 @@ Username of your PAUSE account
 
     my $commit_helper = Helper::Commit->new(
         git       => 0, # true if you want git commit and push
-        cpan      => 0, # true if you want to upload to CPAN (will set git true!)
+        cpan      => 0, # true if you want to upload to CPAN
         cpan_user => 'mugenken',
     );
 

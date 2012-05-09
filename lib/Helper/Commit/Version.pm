@@ -12,7 +12,7 @@ sub new {
 
 sub get {
     my $self    = shift;
-    my $VERSION = version->declare('0.00.02')->numify;
+    my $VERSION = version->declare('0.00.03')->numify;
     return $VERSION;
 }
 
@@ -30,7 +30,7 @@ This is an unstable development release not ready for production!
 
 =head1 VERSION
 
-Version 0.000002
+Version 0.000003
 
 =head1 SYNOPSIS
 
