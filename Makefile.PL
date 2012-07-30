@@ -2,19 +2,19 @@
 require 5.012;
 use ExtUtils::MakeMaker;
 WriteMakefile(
+    'PL_FILES'     => {},
+    'INSTALLDIRS'  => 'site',
     'NAME'         => 'Helper::Commit',
+    'EXE_FILES'    => [],
     'VERSION_FROM' => 'lib/Helper/Commit/Version.pm',
     'PREREQ_PM'    => {
-        'CPAN::Uploader' => 0,
-        'File::Copy'     => 0,
-        'File::Find'     => 0,
-        'File::Slurp'    => 0,
         'Getopt::Long'   => 0,
-        'Module::Build'  => '0.38',
+        'File::Copy'     => 0,
         'Moo'            => 0,
-        'Perl::Tidy'     => 0
-    },
-    'INSTALLDIRS' => 'site',
-    'EXE_FILES'   => [],
-    'PL_FILES'    => {}
+        'CPAN::Uploader' => 0,
+        'Perl::Tidy'     => 0,
+        'File::Find'     => 0,
+        'Module::Build'  => '0.38',
+        'File::Slurp'    => 0
+    }
 );

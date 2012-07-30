@@ -96,10 +96,12 @@ sub _say_prompt {
 
 sub _bump_version {
     my ($self) = @_;
-    my $old_version = qx[awk '/^Version/ {print \$2}' \$(find lib/ -name Version.pm)];
+    my $old_version =
+      qx[awk '/^Version/ {print \$2}' \$(find lib/ -name Version.pm)];
     chomp $old_version;
 
-    my $module = qx[awk '/^package/ {print \$2}' \$(find lib/ -name Version.pm)];
+    my $module =
+      qx[awk '/^package/ {print \$2}' \$(find lib/ -name Version.pm)];
     ( $module = $module ) =~ s/;//;
     chomp $module;
 
@@ -111,7 +113,7 @@ sub _bump_version {
     if ( $old_version != $version ) {
         for (@files) {
             chomp;
-            edit_file {s/$old_version/$version/g} $_;
+            edit_file { s/$old_version/$version/g } $_;
         }
 
         $self->_new_version(1);
@@ -260,7 +262,8 @@ sub _build_dist {
 sub _cpan_upload {
     my ($self) = @_;
 
-    my $module = qx[awk '/^package/ {print \$2}' \$(find lib/ -name Version.pm)];
+    my $module =
+      qx[awk '/^package/ {print \$2}' \$(find lib/ -name Version.pm)];
     ( $module = $module ) =~ s/;//;
     chomp $module;
 
@@ -281,7 +284,8 @@ sub _cpan_upload {
     system 'stty echo';
     chomp $pass;
 
-    my $uploader = CPAN::Uploader->new( { user => $self->cpan_user, password => $pass } );
+    my $uploader =
+      CPAN::Uploader->new( { user => $self->cpan_user, password => $pass } );
 
     $uploader->upload_file($file);
 
